@@ -1,0 +1,49 @@
+{
+    "variables": {
+        "version": "0.2.0",
+        "headless": "true",
+        "iso_url": "THEPATHTOYOURCENTOS65ISOFILE",
+        "iso_checksum": "THECHECKSUMOFYOUR65ISOFILE"
+    },
+    "builders": [{
+        "vm_name": "centos65",
+        "type": "vmware-iso",
+        "guest_os_type": "centos-64",
+        "http_directory": "http",
+        "iso_url": "{{ user `iso_url` }}",
+        "iso_checksum": "{{ user `iso_checksum` }}",
+        "iso_checksum_type": "sha1",
+        "ssh_username": "vagrant",
+        "ssh_password": "vagrant",
+        "ssh_wait_timeout": "10000s",
+        "headless": "{{ user `headless` }}",
+        "tools_upload_flavor": "linux",
+        "boot_command": [
+            "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort}}/ks6.cfg<enter>"
+        ],
+        "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
+        "disk_size": 10140,
+        "vmx_data": {
+            "memsize": "512",
+            "numvcpus": "1",
+            "cpuid.coresPerSocket": "1"
+        }
+    }],
+    "provisioners": [{
+        "type": "shell",
+        "execute_command": "echo 'vagrant' | {{.Vars}} sudo -E -S bash '{{.Path}}'",
+        "scripts": [
+            "script/sshd.sh",
+            "script/update.sh",
+            "script/vagrant.sh",
+            "script/vmware.sh",
+            "script/puppet.sh",
+            "script/cleanup.sh"
+        ]
+    }],
+    "post-processors": [{
+        "type": "vagrant",
+        "keep_input_artifact": false,
+        "output": "box/{{.Provider}}/centos65-puppet-{{user `version`}}.box"
+    }]
+}

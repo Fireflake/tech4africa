@@ -1,0 +1,41 @@
+{
+    "builders": [
+        {
+            "type": "amazon-instance",
+            "region": "eu-west-1",
+            "source_ami": "ami-4e01e939",
+            "instance_type": "m1.small",
+            "ssh_username": "ec2-user",
+            "ami_name": "Magento Tech4Africa {{timestamp}}",
+            "s3_bucket": "YOURS3BUCKETNAME",
+            "account_id": "YOURAWSACCOUNTID",
+            "x509_cert_path": "keys/x509.cert",
+            "x509_key_path": "keys/x509.key",
+            "x509_upload_path": "/tmp",
+            "ssh_timeout": "10m",
+            "bundle_vol_command": "sudo -n /usr/local/bin/ec2-bundle-vol -k {{.KeyPath}} -u {{.AccountId}} -c {{.CertPath}} -r {{.Architecture}} -e {{.PrivatePath}}/* -d {{.Destination}} -p {{.Prefix}} --batch --no-filter",
+            "bundle_upload_command": "sudo -n /usr/local/bin/ec2-upload-bundle -b {{.BucketName}} -m {{.ManifestPath}} -a {{.AccessKey}} -s {{.SecretKey}} -d {{.BundleDirectory}} --batch --region {{.Region}} --retry",
+            "bundle_destination": "/media/ephemeral0"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "execute_command": "{{.Vars}} sudo -E bash '{{.Path}}'",
+            "scripts": [
+                "script/update.sh",
+                "script/amitools.sh",
+                "script/puppet.sh"
+            ]
+        },
+        {
+            "type": "puppet-masterless",
+            "manifest_file": "../puppet/manifests/init.pp",
+            "manifest_dir": "../puppet/manifests",
+            "module_paths": [ "../puppet/modules" ],
+            "facter": {
+                "server_roles": "apache, aws-app"
+            }
+        }
+    ]
+}

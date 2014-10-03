@@ -1,0 +1,59 @@
+:aws_region:
+  eu-west-1
+
+:security_groups:
+  - main:
+    :name                       : tech4africa
+    :description                : This is the default security group to allow traffic
+    :vpc_id                     : YOURDEFAULTVPCID
+
+
+:launch_configurations:
+  - main:
+    :id                         : tech4africa-20140924
+    :image_id                   : THEIDOFYOURAMI
+    :key_name                   : THENAMEOFYOURKEYONAWS
+    :instance_type              : m1.small
+    :user_data                  :
+    :security_group_names       :
+      - tech4africa
+
+:as_groups:
+  - main:
+    :id                         : tech4africa
+    :launch_configuration_name  : tech4africa-20140924
+    :min_size                   : 0
+    :max_size                   : 0
+    :desired_capacity           : 0
+    :availability_zones         :
+      - eu-west-1a
+      - eu-west-1b
+    :health_check_grace_period  : 60
+    :vpc_zone_identifier        : SUBNETIDFORWEST1A,SUBNETIDFORWEST1B
+    :load_balancer_names        :
+      - tech4africa
+    :health_check_type          : ELB
+
+
+:load_balancers:
+  - main:
+    :id                         : tech4africa
+    :listeners                  :
+      - HTTP                    :
+        :lb_port                : 80
+        :instance_port          : 80
+        :protocol               : HTTP
+        :instance_protocol      : HTTP
+    :health_check               :
+        HealthyThreshold        : 2
+        Interval                : 60
+        Target                  : TCP:80
+        Timeout                 : 30
+        UnhealthyThreshold      : 5
+    :security_group_names       :
+      - tech4africa
+    :subnet_ids                 : THEIDOFYOURSUBNET
+    :vpc_id                     : YOURDEFAULTVPCID
+    :availability_zones         :
+      - eu-west-1a
+      - eu-west-1b

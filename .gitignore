@@ -1,0 +1,31 @@
+# Local Environment
+.idea
+
+# exclude our credentials
+build-cloud/set_buildcloud_credentials.sh
+build-cloud/tech4africa.yml
+packer/set_packer_credentials.sh
+packer/keys/*
+packer/centos65-ec2.json
+packer/centos65-local.json
+puppet/modules/application/files/local.xml
+
+# we don't need the whole vagrant storage
+.vagrant
+
+# don't check in centos iso files
+iso
+
+# this is just our local dump file
+magento.sql
+
+# this is managed differently
+www
+
+# packer exclusions
+packer/box/vmware/*
+packer/packer_cache
+
+# keep a few files
+!packer/box/vmware/.gitkeep
+!packer/keys/.gitkeep
